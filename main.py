@@ -1,26 +1,25 @@
-# This example requires the 'message_content' privileged intents
-
 import os
 import discord
 from discord.ext import commands
 
-
 intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
-
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} commands")
+    except Exception as e:
+        print(f"Sync error: {e}")
 
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
+@bot.tree.command(name="ping", description="Check if bot is online")
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message("Pong! 🏓")
 
-@bot.command()
-async def hello(ctx):
-    await ctx.send("Choo choo! 🚅")
-
+@bot.tree.command(name="hello", description="Say hello")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message("Choo choo! 🚅")
 
 bot.run(os.environ["DISCORD_TOKEN"])
